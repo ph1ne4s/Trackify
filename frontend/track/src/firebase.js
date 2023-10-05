@@ -1,11 +1,13 @@
 // Import the functions you need from the SDKs you need
-import firebase from "firebase/app"
-import "firebase/auth"
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
+import "firebase/compat/firestore";
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
-const config = {
+const firebaseConfig = {
   apiKey: "AIzaSyCxnj-nELG70Qy_08hrBrJBIMyXhk6daBc",
   authDomain: "trackify-7df8c.firebaseapp.com",
   projectId: "trackify-7df8c",
@@ -15,10 +17,8 @@ const config = {
 };
 
 // Initialize Firebase
-if (!firebase.apps.length) {
-  firebase.initializeApp(config);
-}
+firebase.initializeApp(firebaseConfig);
 
 export const auth = firebase.auth();
-export const googleAuthProvider = new firebase.auth.GoogleAuthProvider();
-export default app;
+export const googleProvider = new firebase.auth.GoogleAuthProvider();
+//export default app;

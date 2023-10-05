@@ -7,15 +7,19 @@ const Attendance = require('../models/attendance');
 
 // Create a new user
 exports.createUser = async (req, res) => {
+  const userData = req.body;
+
   try {
-    const userData = req.body;
+    // Create a new user
     const user = new User(userData);
     await user.save();
+
     res.status(201).json({ message: 'User created successfully', user });
   } catch (error) {
     res.status(400).json({ error: 'Failed to create user', message: error.message });
   }
 };
+
 
 // Update a user by ID
 exports.updateUser = async (req, res) => {
@@ -35,75 +39,108 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-// List all submissions for a user
-exports.listSubmissions = async (req, res) => {
+
+
+// List submissions for a user
+exports.listSubmissionsForUser = async (req, res) => {
   const userId = req.params.userId;
 
   try {
-    // Find the user
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+    // Find all submissions submitted by the user
+    const submissions = await Submission.find({ submittedBy: userId }).populate('subject');
+
+    if (!submissions) {
+      return res.status(404).json({ error: 'Submissions not found for this user' });
     }
 
-    // Find all submissions for the user
-    const submissions = await Submission.find({ submissionsOf: userId });
     res.status(200).json({ submissions });
   } catch (error) {
     res.status(500).json({ error: 'Error listing submissions', message: error.message });
   }
 };
 
+
+
+
 // Create a new submission
 exports.createSubmission = async (req, res) => {
   const submissionData = req.body;
 
   try {
+        // Check if the user already has a submission for the same subject
+        const existingSubmission = await Submission.findOne({
+          subject: submissionData.subject,
+          submittedBy: submissionData.submittedBy,
+        });
+    
+        if (existingSubmission) {
+          return res.status(400).json({ error: 'Duplicate submission for the same subject' });
+        }
     // Create a new submission
     const submission = new Submission(submissionData);
     await submission.save();
+
+    // Update the user's submissions array with the submission information
+    const user = await User.findById(submissionData.submittedBy);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Add the submission to the user's submissions array
+    user.submissions.push({
+      submission: submission._id,
+      isSubmitted: false, // Initially set as not submitted
+    });
+
+    // Save the updated user document
+    await user.save();
+
     res.status(201).json({ message: 'Submission created successfully', submission });
   } catch (error) {
     res.status(400).json({ error: 'Failed to create submission', message: error.message });
   }
 };
-
 // Update a submission by ID
-exports.updateSubmission = async (req, res) => {
+exports.updateSubmissionStatus = async (req, res) => {
   const submissionId = req.params.submissionId;
-  const updateData = req.body;
+  const { isSubmitted } = req.body;
 
   try {
-    // Find and update the submission
-    const submission = await Submission.findByIdAndUpdate(submissionId, updateData, { new: true });
+    // Check if the submission exists
+    const submission = await Submission.findById(submissionId);
 
     if (!submission) {
       return res.status(404).json({ error: 'Submission not found' });
     }
 
-    res.status(200).json({ message: 'Submission updated successfully', submission });
+    // Update the submission status
+    submission.haveSubmitted = isSubmitted;
+    await submission.save();
+
+    res.status(200).json({ message: 'Submission status updated successfully', submission });
   } catch (error) {
-    res.status(400).json({ error: 'Failed to update submission', message: error.message });
+    res.status(400).json({ error: 'Failed to update submission status', message: error.message });
   }
 };
 
 // Delete a submission by ID
-exports.deleteSubmission = async (req, res) => {
-  const submissionId = req.params.submissionId;
+// exports.deleteSubmission = async (req, res) => {
+//   const submissionId = req.params.submissionId;
 
-  try {
-    // Find and delete the submission
-    const submission = await Submission.findByIdAndDelete(submissionId);
+//   try {
+//     // Find and delete the submission
+//     const submission = await Submission.findByIdAndDelete(submissionId);
 
-    if (!submission) {
-      return res.status(404).json({ error: 'Submission not found' });
-    }
+//     if (!submission) {
+//       return res.status(404).json({ error: 'Submission not found' });
+//     }
 
-    res.status(200).json({ message: 'Submission deleted successfully' });
-  } catch (error) {
-    res.status(400).json({ error: 'Failed to delete submission', message: error.message });
-  }
-};
+//     res.status(200).json({ message: 'Submission deleted successfully' });
+//   } catch (error) {
+//     res.status(400).json({ error: 'Failed to delete submission', message: error.message });
+//   }
+// };
 
 // Fetch all subjects
 exports.fetchSubjects = async (req, res) => {

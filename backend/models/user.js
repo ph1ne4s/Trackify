@@ -17,29 +17,36 @@ const userSchema = new mongoose.Schema({
         type: ObjectId,
         ref: 'Subject',
       },
-      attendance: {
-        lecture: Number,
-        tutorial: Number,
-        practical: Number,
+    },
+  ],
+  attendance: [
+    {
+      subject: {
+        type: ObjectId,
+        ref: 'Subject',
       },
-      submissions: [
-        {
-          submission: {
-            type: ObjectId,
-            ref: 'Submission',
-          },
-          isSubmitted: Boolean,
-        },
-      ],
-      todo: [
-        {
-          task: String,
-          dueDate: Date,
-          isCompleted: Boolean,
-        },
-      ],
+      lecture: Number,
+      tutorial: Number,
+      practical: Number,
+    },
+  ],
+  submissions: [
+    {
+      submission: {
+        type: ObjectId,
+        ref: 'Submission',
+      },
+      isSubmitted: Boolean,
+    },
+  ],
+  todo: [
+    {
+      task: String,
+      dueDate: Date,
+      isCompleted: Boolean,
     },
   ],
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);
+
