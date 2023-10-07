@@ -8,7 +8,7 @@ function SubmissionsPage({ userId }) {
 
   // Function to fetch user's submissions
   const fetchSubmissions = () => {
-    axios.get(`/api/submissions/${userId}`)
+    axios.get(`http://localhost:8000/api/submissions/651e56d72d8e62bd74df1cac`)
       .then((response) => {
         setSubmissions(response.data.submissions);
         setLoading(false);
@@ -21,14 +21,17 @@ function SubmissionsPage({ userId }) {
 
   // Function to mark a submission as done
   const markSubmissionAsDone = (submissionId) => {
-    axios.put(`/api/submissions/update/${submissionId}`, { isSubmitted: true })
+    // Update the UI to reflect the change (move the submission to the 'Completed' section)
+    setSubmissions((prevSubmissions) =>
+      prevSubmissions.map((submission) =>
+        submission._id === submissionId ? { ...submission, haveSubmitted: true } : submission
+      )
+    );
+
+    // Send a PUT request to update the submission status in the database
+    axios.put(`http://localhost:8000/api/submissions/update/651fa7d28e1ffad4eec589f0`, { isSubmitted: true })
       .then(() => {
-        // Update the UI to reflect the change (move the submission to the 'Completed' section)
-        setSubmissions((prevSubmissions) =>
-          prevSubmissions.map((submission) =>
-            submission._id === submissionId ? { ...submission, haveSubmitted: true } : submission
-          )
-        );
+        // No need to update the UI again here, as it's already done above
       })
       .catch((error) => {
         console.error('Error updating submission status:', error);
@@ -46,41 +49,40 @@ function SubmissionsPage({ userId }) {
 
   return (
     <div className="container mt-4">
-      <h2>Pending Submissions</h2>
-      <ul className="list-group">
-        {submissions.map((submission) => (
-          !submission.haveSubmitted && (
-            <li key={submission._id} className="list-group-item">
-              <div className="d-flex justify-content-between align-items-center">
-                <span>{submission.subject.name}</span>
-                <span>{submission.deadline}</span>
-                <button
-                  className="btn btn-primary"
-                  onClick={() => markSubmissionAsDone(submission._id)}
-                >
-                  Mark as Done
-                </button>
-              </div>
-            </li>
-          )
-        ))}
-      </ul>
-      <h2 className="mt-4">Completed Submissions</h2>
-      <ul className="list-group">
-        {submissions.map((submission) => (
-          submission.haveSubmitted && (
-            <li key={submission._id} className="list-group-item">
-              <div className="d-flex justify-content-between align-items-center">
-                <span>{submission.subject.name}</span>
-                <span>{submission.deadline} (Completed)</span>
-              </div>
-            </li>
-          )
-        ))}
-      </ul>
-    </div>
+    <h2 className="mb-4">Pending Submissions</h2>
+    <ul className="list-group">
+      {submissions.map((submission) => (
+        !submission.haveSubmitted && (
+          <li key={submission._id} className="list-group-item">
+            <div className="d-flex justify-content-between align-items-center">
+              <span className="mr-2">{submission.subject.Name}</span>
+              <span className="badge badge-primary">{submission.deadline}</span>
+              <button
+                className="btn btn-success ml-2"
+                onClick={() => markSubmissionAsDone(submission._id)}
+              >
+                Mark as Done
+              </button>
+            </div>
+          </li>
+        )
+      ))}
+    </ul>
+    <h2 className="mt-4">Completed Submissions</h2>
+    <ul className="list-group">
+      {submissions.map((submission) => (
+        submission.haveSubmitted && (
+          <li key={submission._id} className="list-group-item">
+            <div className="d-flex justify-content-between align-items-center">
+              <span className="mr-2">{submission.subject.Name}</span>
+              <span className="badge badge-success">{submission.deadline} (Completed)</span>
+            </div>
+          </li>
+        )
+      ))}
+    </ul>
+  </div>
   );
 }
 
 export default SubmissionsPage;
-

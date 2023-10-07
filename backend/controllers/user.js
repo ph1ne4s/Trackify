@@ -192,3 +192,25 @@ exports.viewAttendance = async (req, res) => {
       res.status(400).json({ error: 'Failed to create subject', message: error.message });
     }
   };
+
+  // Create a new task
+exports.createTodo = async (req, res) => {
+  try {
+    const { task, dateTime } = req.body;
+    const newTodo = new Todo({ task, dateTime });
+    await newTodo.save();
+    res.status(201).json(newTodo);
+  } catch (error) {
+    res.status(500).json({ error: 'Could not save the task.' });
+  }
+};
+
+// Get all tasks
+exports.getAllTodos = async (req, res) => {
+  try {
+    const todos = await Todo.find();
+    res.json(todos);
+  } catch (error) {
+    res.status(500).json({ error: 'Could not retrieve tasks.' });
+  }
+};
