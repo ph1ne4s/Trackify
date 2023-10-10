@@ -45,13 +45,31 @@ const UserForm = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission here, e.g., send data to the server
-
-    console.log(user);
+  
+    try {
+      // Extract the subjects' data from the user object
+      const subjectsData = user.subjects;
+  
+      // Send subjectsData to the server to create subjects
+      const response = await axios.post('/api/subjects/create', subjectsData);
+      console.log('Server response:', response.data);
+  
+      // Reset the form after successful submission
+      setUser({
+        name: '',
+        batch: '',
+        branch: 'Select Branch',
+        enrollmentNumber: '',
+        email: '',
+        subjects: [initialSubject],
+      });
+    } catch (error) {
+      console.error('Error:', error);
+    }
   };
-
+  
   return (
     <div className="container mt-5">
       <h2 className="text-center mb-4">User Info Form</h2>

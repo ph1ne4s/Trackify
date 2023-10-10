@@ -24,7 +24,7 @@ router.put('/submissions/update/:submissionId', userController.updateSubmissionS
 
 router.get('/subjects', userController.fetchSubjects);
 
-router.post('/subjects/create', userController.createSubject);
+router.post('/subjects/create/:userId', userController.createSubject);
 
 // Create a new task
 router.post('/Todo', userController.createTodo);
