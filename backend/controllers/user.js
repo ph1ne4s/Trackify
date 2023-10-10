@@ -182,17 +182,34 @@ exports.viewAttendance = async (req, res) => {
     }
   };
 
+  const User = require('../models/user');
+  const Subject = require('../models/subject');
+  
   exports.createSubject = async (req, res) => {
     const subjectData = req.body;
+    const userId = req.params.userId; // Get the userId from the route parameter
   
     try {
-      const subject = new Subject(subjectData);
+      // Create the subject with the associated userId
+      const subject = new Subject({
+        ...subjectData,
+        userId: userId,
+      });
+  
+      // Save the subject to the database
       await subject.save();
+  
+      // Update the user's subjects array by pushing the subject's ObjectId
+      await User.findByIdAndUpdate(userId, {
+        $push: { subjects: subject._id },
+      });
+  
       res.status(201).json({ message: 'Subject created successfully', subject });
     } catch (error) {
       res.status(400).json({ error: 'Failed to create subject', message: error.message });
     }
   };
+  
 
   // Create a new task
 exports.createTodo = async (req, res) => {
