@@ -17,13 +17,15 @@ const userSchema = new mongoose.Schema({
         type: ObjectId,
         ref: 'Subject',
       },
+      name: String, 
+      code: String, 
     },
   ],
   attendance: [
     {
       subject: {
         type: ObjectId,
-        ref: 'Subject',
+        ref: 'Subject', 
       },
       lecture: Number,
       tutorial: Number,

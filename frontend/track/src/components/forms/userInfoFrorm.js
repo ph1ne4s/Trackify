@@ -1,15 +1,67 @@
-import React, { useState } from 'react';
+// UserForm.js
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const UserForm = () => {
-  const initialSubject = { subject: '', code: '' };
-    const [user, setUser] = useState({
+  const userId = "651e56d72d8e62bd74df1cac";
+
+  const [user, setUser] = useState({
     name: '',
     batch: '',
     branch: 'Select Branch',
     enrollmentNumber: '',
     email: '',
-    subjects: [initialSubject],
+    subjectIds: [],
+    subjects: [],
   });
+
+  // const getSubjectDetails = async (subjectId) => {
+  //   try {
+  //     const response = await axios.get(`http://localhost:8000/api/subjects/${subjectId}`);
+  //     return response.data.subject;
+  //   } catch (error) {
+  //     console.error('Error fetching subject details:', error);
+  //     return null;
+  //   }
+  // };
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8000/api/users/${userId}`);
+        const userData = response.data.user;
+  
+        setUser((prevUser) => ({
+          ...prevUser,
+          name: userData.name,
+          email: userData.email,
+          batch: userData.batch,
+          branch: userData.branch,
+          enrollmentNumber: userData.enrollmentNo,
+          subjects: userData.subjects.map((subjectData) => ({
+            name: subjectData.name,
+            code: subjectData.code,
+          })),
+        }));
+       console.log(user);
+        // if (userData.subjects) {
+        //   const subjectIds = userData.subjects.map((subjectData) => subjectData._id);
+        //   const subjectDetails = await Promise.all(subjectIds.map(getSubjectDetails));
+        //   setUser((prevUser) => ({
+        //     ...prevUser,
+        //     subjects: subjectDetails,
+        //   }));
+        // }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+  
+    fetchData();
+  }, [userId]);
+  
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -32,7 +84,7 @@ const UserForm = () => {
   const addSubject = () => {
     setUser({
       ...user,
-      subjects: [...user.subjects, initialSubject],
+      subjects: [...user.subjects, { subject: '', code: '' }],
     });
   };
 
@@ -49,22 +101,8 @@ const UserForm = () => {
     e.preventDefault();
   
     try {
-      // Extract the subjects' data from the user object
-      const subjectsData = user.subjects;
-  
-      // Send subjectsData to the server to create subjects
-      const response = await axios.post('/api/subjects/create', subjectsData);
+      const response = await axios.put(`http://localhost:8000/api/updateUser/${userId}`, user);
       console.log('Server response:', response.data);
-  
-      // Reset the form after successful submission
-      setUser({
-        name: '',
-        batch: '',
-        branch: 'Select Branch',
-        enrollmentNumber: '',
-        email: '',
-        subjects: [initialSubject],
-      });
     } catch (error) {
       console.error('Error:', error);
     }
@@ -108,11 +146,10 @@ const UserForm = () => {
             onChange={handleChange}
             required
           >
-            <option value="Select Branch">Select Branch</option>
+            <option value="Select Branch">{user.branch}</option>
             <option value="Branch 1">Branch 1</option>
             <option value="Branch 2">Branch 2</option>
             <option value="Branch 3">Branch 3</option>
-            {/* Add more branch options here */}
           </select>
         </div>
         <div className="form-group">
@@ -122,7 +159,7 @@ const UserForm = () => {
             className="form-control"
             id="enrollmentNumber"
             name="enrollmentNumber"
-            value={user.enrollmentNumber}
+            value={user.enrollmentNumber }
             onChange={handleChange}
             required
           />
@@ -149,7 +186,7 @@ const UserForm = () => {
                 className="form-control"
                 id={`subject${index}`}
                 name="subject"
-                value={subject.subject}
+                value={subject.name}
                 onChange={(e) => handleSubjectChange(e, index)}
                 required
               />
@@ -187,6 +224,3 @@ const UserForm = () => {
 };
 
 export default UserForm;
-
-
-

@@ -22,10 +22,13 @@ exports.createUser = async (req, res) => {
 
 
 // Update a user by ID
-exports.updateUser = async (req, res) => {
-  const userId = req.params.id;
-  const updateData = req.body;
+// Import necessary modules and models
+// const User = require('../models/user');
 
+exports.updateUser = async (req, res) => {
+  const userId = req.params.userId;
+  const updateData = req.body;
+  
   try {
     const user = await User.findByIdAndUpdate(userId, updateData, { new: true });
 
@@ -39,6 +42,27 @@ exports.updateUser = async (req, res) => {
   }
 };
 
+
+
+exports.getUserInfo = async (req, res) => {
+  try {
+    const userId = req.params.userId; // Get the userId from the route parameter
+
+    // Find the user by ID
+    const user = await User.findById(userId)
+      .populate('subjects.subject') // Populate the subjects with details if needed
+      .populate('attendance.subject'); // Populate attendance subjects with details if needed
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Return the user information
+    res.status(200).json({ user });
+  } catch (error) {
+    res.status(500).json({ error: 'Error getting user information', message: error.message });
+  }
+};
 
 
 // List submissions for a user
@@ -153,6 +177,24 @@ exports.fetchSubjects = async (req, res) => {
     }
   };
 
+
+  exports.getSubjectDetails = async (req, res) => {
+    const { subjectId } = req.params;
+  
+    try {
+      // Find the subject by ObjectId
+      const subject = await Subject.findById(subjectId);
+  
+      if (!subject) {
+        return res.status(404).json({ error: 'Subject not found',message:error.message });
+      }
+  
+      res.status(200).json({ message: 'Subject details retrieved successfully', subject });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to retrieve subject details', message: error.message });
+    }
+  };
+
   // View user attendance for a specific subject
 exports.viewAttendance = async (req, res) => {
     const userId = req.params.userId;
@@ -181,17 +223,18 @@ exports.viewAttendance = async (req, res) => {
     }
   };
 
-  const User = require('../models/user');
-  const Subject = require('../models/subject');
+  // const User = require('../models/user');
+  // const Subject = require('../models/subject');
   
   exports.createSubject = async (req, res) => {
-    const subjectData = req.body;
+    const { name, code } = req.body; // Extract name and code from the request body
     const userId = req.params.userId; // Get the userId from the route parameter
   
     try {
-      // Create the subject with the associated userId
+      // Create the subject with the associated userId, name, and code
       const subject = new Subject({
-        ...subjectData,
+        name: name,
+        code: code,
         userId: userId,
       });
   
@@ -200,7 +243,7 @@ exports.viewAttendance = async (req, res) => {
   
       // Update the user's subjects array by pushing the subject's ObjectId
       await User.findByIdAndUpdate(userId, {
-        $push: { subjects: subject._id },
+        $push: { subjects: { _id: subject._id, name: name, code: code } },
       });
   
       res.status(201).json({ message: 'Subject created successfully', subject });
@@ -208,6 +251,7 @@ exports.viewAttendance = async (req, res) => {
       res.status(400).json({ error: 'Failed to create subject', message: error.message });
     }
   };
+  
   
 
   // Create a new task
