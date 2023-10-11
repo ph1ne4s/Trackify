@@ -4,6 +4,7 @@ const User = require('../models/user');
 const Submission = require('../models/submissions');
 const Subject = require('../models/subject');
 const Attendance = require('../models/attendance');
+const Todo = require('../models/todo');
 
 // Create a new user
 exports.createUser = async (req, res) => {
