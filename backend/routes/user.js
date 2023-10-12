@@ -27,9 +27,9 @@ router.get('/subjects', userController.fetchSubjects);
 router.post('/subjects/create/:userId', userController.createSubject);
 
 // Create a new task
-router.post('/Todo', userController.createTodo);
+router.post('/Todo/create/:userId', userController.createTodo);
 
 // Get all tasks
-router.get('/Todo', userController.getAllTodos);
+router.get('/Todo/:userId', userController.getAllTodos);
 
 module.exports = router;

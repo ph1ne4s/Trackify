@@ -1,5 +1,5 @@
 // controllers/attendanceController.js
-const Attendance = require('../models/attendance');
+// const Attendance = require('../models/attendance');
 
 // Mark attendance for a subject
 // controllers/attendanceController.js
