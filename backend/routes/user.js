@@ -2,12 +2,14 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/user');
+const attendanceController = require('../controllers/attendance');
 
 router.post('/createUser', userController.createUser);
 
 
-router.put('/updateUser/:id', userController.updateUser);
+router.put('/updateUser/:userId', userController.updateUser);
 
+router.get('/users/:userId', userController.getUserInfo);
 
 router.get('/attendance/:userId/:subjectId', userController.viewAttendance);
 
@@ -26,10 +28,15 @@ router.get('/subjects', userController.fetchSubjects);
 
 router.post('/subjects/create/:userId', userController.createSubject);
 
+router.get('/subjects/:subjectId', userController.getSubjectDetails);
+
 // Create a new task
 router.post('/Todo/create/:userId', userController.createTodo);
 
 // Get all tasks
 router.get('/Todo/:userId', userController.getAllTodos);
+
+router.put('/mark/:subjectId', attendanceController.markAttendance);
+router.get('/attendance/:subjectId', attendanceController.fetchAttendance);
 
 module.exports = router;
