@@ -2,10 +2,7 @@ const mongoose = require('mongoose');
 const { ObjectId } = mongoose.Schema;
 
 const submissionSchema = new mongoose.Schema({
-  subject: {
-    type: ObjectId,
-    ref: 'Subject',
-  },
+  subjectname:String,
   category: {
     type: ObjectId,
     ref: 'Category',

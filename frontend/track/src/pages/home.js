@@ -17,7 +17,7 @@ const Home = () => {
               <div className="card-body">
                 <h5 className="card-title">Upload your Time Table</h5>
                 <p className="card-text">Click this button to upload your time table.</p>
-                <a href="#" className="btn btn-primary">Upload</a>
+                <a href="/timetable" className="btn btn-primary">Upload</a>
               </div>
             </div>
           </div>
