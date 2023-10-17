@@ -31,10 +31,10 @@ router.post('/subjects/create/:userId', userController.createSubject);
 router.get('/subjects/:subjectId', userController.getSubjectDetails);
 
 // Create a new task
-router.post('/Todo', userController.createTodo);
+router.post('/Todo/create/:userId', userController.createTodo);
 
 // Get all tasks
-router.get('/Todo', userController.getAllTodos);
+router.get('/Todo/:userId', userController.getAllTodos);
 
 router.put('/mark/:subjectId', attendanceController.markAttendance);
 router.get('/attendance/:subjectId', attendanceController.fetchAttendance);
