@@ -11,11 +11,15 @@ const Todo = () => {
   const [tasks, setTasks] = useState([]);
   const [showTasks, setShowTasks] = useState(true); // Initially show tasks
 
+  // Replace this hardcoded user ID with your actual user ID retrieval logic
+  const userId = '6531730c01f2b487d8dbe86e';
+
   useEffect(() => {
     // Fetch the To-Do list when the component loads
     async function fetchTodoList() {
       try {
-        const response = await axios.get('http://localhost:8000/api/Todo/651e56d72d8e62bd74df1cac');
+        // Use the retrieved user ID in the URL
+        const response = await axios.get(`http://localhost:8000/api/Todo/${userId}`);
         setTasks(response.data);
       } catch (error) {
         console.error('Error fetching tasks:', error);
@@ -23,7 +27,7 @@ const Todo = () => {
     }
 
     fetchTodoList();
-  }, []);
+  }, [userId]); // Make sure to include userId in the dependency array
 
   const toggleTasksVisibility = () => {
     setShowTasks(!showTasks);
@@ -36,7 +40,8 @@ const Todo = () => {
         dateTime: moment(`${date.format('YYYY-MM-DD')} ${time.format('HH:mm')}`),
       };
       try {
-        const response = await axios.post('http://localhost:8000/api/Todo/create/651e56d72d8e62bd74df1cac', newTask);
+        // Use the retrieved user ID in the URL
+        const response = await axios.post(`http://localhost:8000/api/Todo/create/${userId}`, newTask);
         const savedTask = response.data;
         setTasks([...tasks, savedTask]);
         setTask('');

@@ -7,6 +7,7 @@ import Submissions from './pages/submissions/submission';
 import Todo from './pages/todo/ToDolist';
 import UserForm from './components/forms/userInfoFrorm';
 import Timetable from './components/timetable';
+import AuthPage from './pages/auth/AuthPage';
 // import EmailPasswordRegister from './pages/auth/Emailregister'
 // import GoogleRegister from './pages/auth/Googleregister'
 // import Dashboard from "./pages/auth/Dashboard";
@@ -28,6 +29,7 @@ function App() {
         <Route path="/ToDo" element={<Todo />} />
         <Route path="/userInfo" element={<UserForm/>} />
         <Route path="/timetable" element={<Timetable/>} />
+        <Route path="/auth/signup" element={<AuthPage/>}/>
       </Routes>
      
     </div>

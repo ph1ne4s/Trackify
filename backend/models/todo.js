@@ -2,13 +2,16 @@ const mongoose = require('mongoose');
 const { ObjectId } = mongoose.Schema;
 
 const todoSchema = new mongoose.Schema({
-  task: String,
-  dateTime: Date,
-  userId: {
-    type: ObjectId,
-    ref: 'User', 
+  task: {
+    type: String,
+    required: true,
   },
-}, { timestamps: true });
+  dateTime: {
+    type: Date,
+    required: true,
+    default: Date.now,
+  },
+});
 
 
 const Todo = mongoose.model('Todo', todoSchema);

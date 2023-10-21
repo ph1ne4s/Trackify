@@ -44,8 +44,7 @@ const userSchema = new mongoose.Schema({
   todo: [
     {
       task: String,
-      dueDate: Date,
-      isCompleted: Boolean,
+      dateTime: Date,
     },
   ],
 }, { timestamps: true });
