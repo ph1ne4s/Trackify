@@ -24,17 +24,27 @@ router.put('/submissions/update/:submissionId', userController.updateSubmissionS
 // Delete a submission by ID
 // router.delete('/submissions/delete/:submissionId', userController.deleteSubmission);
 
-router.get('/subjects', userController.fetchSubjects);
+// router.get('/subjects', userController.fetchSubjects);
+router.get('/users/:userId/subjects', userController.getSubjectsByUserId);
 
 router.post('/subjects/create/:userId', userController.createSubject);
 
 router.get('/subjects/:subjectId', userController.getSubjectDetails);
 
 // Create a new task
-router.post('/Todo/create/:userId', userController.createTodo);
+// router.post('/Todo/create/:userId', userController.createTodo);
 
 // Get all tasks
-router.get('/Todo/:userId', userController.getAllTodos);
+// router.get('/Todo/:userId', userController.getAllTodos);
+
+router.post('/user/:userId/todo', userController.saveTodo);
+
+// List todos for a user
+router.get('/user/:userId/getTodos', userController.listTodos);
+
+// Remove a todo for a user
+router.delete('/user/:userId/todo/:todoId', userController.removeTodo);
+
 
 router.put('/mark/:subjectId', attendanceController.markAttendance);
 router.get('/attendance/:subjectId', attendanceController.fetchAttendance);

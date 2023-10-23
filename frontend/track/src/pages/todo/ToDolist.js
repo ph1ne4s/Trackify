@@ -1,33 +1,33 @@
 import React, { useEffect, useState } from 'react';
 import { Input, Button, List, Space, DatePicker, TimePicker, Row, Col } from 'antd';
 import moment from 'moment';
-import 'bootstrap/dist/css/bootstrap.css'; // Import Bootstrap CSS
+import 'bootstrap/dist/css/bootstrap.css'; 
 import axios from 'axios';
 
 const Todo = () => {
   const [task, setTask] = useState('');
   const [date, setDate] = useState(null);
   const [time, setTime] = useState(null);
-  const [tasks, setTasks] = useState([]);
-  const [showTasks, setShowTasks] = useState(true); // Initially show tasks
+  const [todos, setTodos] = useState([]); 
+  const [showTasks, setShowTasks] = useState(true);
 
-  // Replace this hardcoded user ID with your actual user ID retrieval logic
-  const userId = '6531730c01f2b487d8dbe86e';
+  const userId = '651e56d72d8e62bd74df1cac';
+
+  const baseUrl = 'http://localhost:8000';
+  const todoUrl = `${baseUrl}/api/user/${userId}/todo`;
 
   useEffect(() => {
-    // Fetch the To-Do list when the component loads
     async function fetchTodoList() {
       try {
-        // Use the retrieved user ID in the URL
-        const response = await axios.get(`http://localhost:8000/api/Todo/${userId}`);
-        setTasks(response.data);
+        const response = await axios.get('http://localhost:8000/api/user/651e56d72d8e62bd74df1cac/Todos');
+        setTodos(response.data.todos); 
       } catch (error) {
         console.error('Error fetching tasks:', error);
       }
     }
 
     fetchTodoList();
-  }, [userId]); // Make sure to include userId in the dependency array
+  }, [userId]);
 
   const toggleTasksVisibility = () => {
     setShowTasks(!showTasks);
@@ -40,10 +40,9 @@ const Todo = () => {
         dateTime: moment(`${date.format('YYYY-MM-DD')} ${time.format('HH:mm')}`),
       };
       try {
-        // Use the retrieved user ID in the URL
-        const response = await axios.post(`http://localhost:8000/api/Todo/create/${userId}`, newTask);
+        const response = await axios.post(todoUrl, newTask);
         const savedTask = response.data;
-        setTasks([...tasks, savedTask]);
+        setTodos([...todos, savedTask]);
         setTask('');
         setDate(null);
         setTime(null);
@@ -53,9 +52,14 @@ const Todo = () => {
     }
   };
 
-  const removeTask = (index) => {
-    const updatedTasks = tasks.filter((_, i) => i !== index);
-    setTasks(updatedTasks);
+  const removeTask = async (taskId) => {
+    try {
+      await axios.delete(`${todoUrl}/${taskId}`);
+      const updatedTodos = todos.filter((item) => item._id !== taskId);
+      setTodos(updatedTodos);
+    } catch (error) {
+      console.error('Error deleting the task', error);
+    }
   };
 
   return (
@@ -95,14 +99,14 @@ const Todo = () => {
             <List
               className="mb-3"
               itemLayout="horizontal"
-              dataSource={tasks}
-              renderItem={(item, index) => (
+              dataSource={todos} // Updated to use "todos" state
+              renderItem={(item) => (
                 <List.Item
                   actions={[
                     <Button
                       type="text"
                       danger
-                      onClick={() => removeTask(index)}
+                      onClick={() => removeTask(item._id)}
                     >
                       Delete
                     </Button>
@@ -113,7 +117,7 @@ const Todo = () => {
                       {item.task}
                     </div>
                     <div className="datetime" style={{ color: 'darkgreen' }}>
-                      {item.dateTime.format('YYYY-MM-DD HH:mm')}
+                      {moment(item.dateTime).format('YYYY-MM-DD HH:mm')}
                     </div>
                   </div>
                 </List.Item>

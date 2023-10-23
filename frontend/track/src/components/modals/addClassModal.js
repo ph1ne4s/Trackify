@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const ClassModal = ({ subjects, day, time, onSave, onCancel, isModalOpen }) => {
+const ClassModal = ({ subjects, day, time, onSave, onCancel }) => {
   const [selectedSubject, setSelectedSubject] = useState('');
 
   const handleSave = () => {
@@ -15,10 +15,7 @@ const ClassModal = ({ subjects, day, time, onSave, onCancel, isModalOpen }) => {
   };
 
   return (
-    <div
-      className={`modal ${isModalOpen ? 'show' : ''}`} // Use conditional class to control visibility
-      style={{ display: isModalOpen ? 'block' : 'none' }} // Control display property
-    >
+    <div className="modal fade show">
       <div className="modal-dialog">
         <div className="modal-content">
           <div className="modal-header">
@@ -28,7 +25,7 @@ const ClassModal = ({ subjects, day, time, onSave, onCancel, isModalOpen }) => {
             </button>
           </div>
           <div className="modal-body">
-          <div className="form-group">
+            <div className="form-group">
               <label htmlFor="subject">Select Subject</label>
               <select
                 id="subject"
@@ -38,8 +35,8 @@ const ClassModal = ({ subjects, day, time, onSave, onCancel, isModalOpen }) => {
               >
                 <option value="">Select a Subject</option>
                 {subjects.map((subject, index) => (
-                  <option key={index} value={subject}>
-                    {subject}
+                  <option key={index} value={subject.name}>
+                    {subject.name}
                   </option>
                 ))}
               </select>
@@ -80,4 +77,3 @@ const ClassModal = ({ subjects, day, time, onSave, onCancel, isModalOpen }) => {
 };
 
 export default ClassModal;
-

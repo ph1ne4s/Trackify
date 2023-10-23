@@ -26,14 +26,14 @@
     useEffect(() => {
       const fetchSubjects = async () => {
         try {
-          const response = await axios.get('http://localhost:8000/api/subjects');
-          const subjectNames = response.data.subjects.map((subject) => subject.Name); // Extract only the subject names
-          setSubjects(subjectNames);
+          // Make a GET request to fetch subjects for the current user
+          const response = await axios.get(`http://localhost:8000/api/users/651e56d72d8e62bd74df1cac/subjects`);
+          setSubjects(response.data.subjects);
         } catch (error) {
           console.error('Error fetching subjects:', error);
         }
       };
-
+  
       fetchSubjects();
 
       const fetchClassInfo = async () => {
@@ -149,7 +149,7 @@
           time={selectedTime}
           onSave={onSave}
           onCancel={closeModal}
-          isModalOpen={isModalOpen} // Pass isModalOpen as a prop
+          isModalOpen={isModalOpen} 
         />
         )}
       </div>

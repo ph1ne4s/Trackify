@@ -167,16 +167,30 @@ exports.updateSubmissionStatus = async (req, res) => {
 //   }
 // };
 
-// Fetch all subjects
-exports.fetchSubjects = async (req, res) => {
-    try {
-      // Find all subjects
-      const subjects = await Subject.find();
-      res.status(200).json({ subjects });
-    } catch (error) {
-      res.status(500).json({ error: 'Error fetching subjects', message: error.message });
+// Fetch all subjects for a user
+
+exports.getSubjectsByUserId = async (req, res) => {
+  const userId = req.params.userId;
+  
+  try {
+    const user = await User.findById(userId).populate('subjects.subject');
+    // console.log(user.batch);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
     }
-  };
+
+    const subjects = user.subjects.map((subject) => ({
+      name: subject.name ,
+      code: subject.code
+    }));
+
+    res.status(200).json({ subjects });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error fetching subjects', message: error.message });
+  }
+};
+
 
 
   exports.getSubjectDetails = async (req, res) => {
@@ -256,43 +270,111 @@ exports.viewAttendance = async (req, res) => {
   
 
 // Create a new task for a user
-exports.createTodo = async (req, res) => {
-  console.log("heeh");
-  try {
-    const { task, dateTime } = req.body;
-    const userId = req.params.userId; // Get the user's ID from the request params
+// exports.createTodo = async (req, res) => {
+//   console.log("heeh");
+//   try {
+//     const { task, dateTime } = req.body;
+//     const userId = req.params.userId; // Get the user's ID from the request params
 
-    // Find the user by ID and add the task to their todo array
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    console.log(user);
+//     // Find the user by ID and add the task to their todo array
+//     const user = await User.findById(userId);
+//     if (!user) {
+//       return res.status(404).json({ error: 'User not found' });
+//     }
+//     console.log(user);
 
-    const newTodo = { task, dateTime };
+//     const newTodo = { task, dateTime };
     
-    user.todo.push(newTodo);
+//     user.todo.push(newTodo);
+//     await user.save();
+
+//     res.status(201).json(newTodo);
+//   } catch (error) {
+//     res.status(500).json({ error: 'Could not save the task.',message: error.message });
+//   }
+// };
+// // Get all tasks for a user
+// exports.getAllTodos = async (req, res) => {
+//   try {
+//     const userId = req.params.userId; // Get the user's ID from the request params
+
+//     // Find the user by ID and return their todo array
+//     const user = await User.findById(userId);
+//     if (!user) {
+//       return res.status(404).json({ error: 'User not found' });
+//     }
+
+//     const todos = user.todo;
+//     res.json(todos);
+//   } catch (error) {
+//     res.status(500).json({ error: 'Could not retrieve tasks.',message: error.message });
+//   }
+// };
+
+
+// Save a new todo for a user
+exports.saveTodo = async (req, res) => {
+  try {
+    const { userId } = req.params; // Extract the user's ID from the request params
+    const { task, dateTime } = req.body;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Add the new todo to the user's todo array
+    user.todo.push({ task, dateTime });
     await user.save();
 
-    res.status(201).json(newTodo);
+    return res.status(201).json({ message: 'Todo saved successfully', user });
   } catch (error) {
-    res.status(500).json({ error: 'Could not save the task.' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 };
-// Get all tasks for a user
-exports.getAllTodos = async (req, res) => {
-  try {
-    const userId = req.params.userId; // Get the user's ID from the request params
 
-    // Find the user by ID and return their todo array
+// List todos for a user
+exports.listTodos = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
     const user = await User.findById(userId);
+
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ message: 'User not found' });
     }
 
-    const todos = user.todo;
-    res.json(todos);
+    return res.status(200).json({ todos: user.todo });
   } catch (error) {
-    res.status(500).json({ error: 'Could not retrieve tasks.' });
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// Remove a todo for a user
+exports.removeTodo = async (req, res) => {
+  try {
+    const { userId, todoId } = req.params;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Find the index of the todo item to remove
+    const todoIndex = user.todo.findIndex((todo) => todo._id.toString() === todoId);
+
+    if (todoIndex === -1) {
+      return res.status(404).json({ message: 'Todo not found' });
+    }
+
+    // Remove the todo from the user's todo array
+    user.todo.splice(todoIndex, 1);
+    await user.save();
+
+    return res.status(200).json({ message: 'Todo removed successfully', user });
+  } catch (error) {
+    return res.status(500).json({ error: 'Internal server error' });
   }
 };
