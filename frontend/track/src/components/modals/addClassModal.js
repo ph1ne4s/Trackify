@@ -1,78 +1,66 @@
 import React, { useState } from 'react';
+import { Modal, Select } from 'antd';
 
-const ClassModal = ({ subjects, day, time, onSave, onCancel }) => {
+const { Option } = Select;
+
+const ClassModal = ({ subjects, day, time, onSave, onCancel, isModalOpen }) => {
   const [selectedSubject, setSelectedSubject] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState(''); // State for selected category
 
   const handleSave = () => {
-    // Check if a subject is selected
-    if (!selectedSubject) {
-      alert('Please select a subject.');
+    if (!selectedSubject || !selectedCategory) {
+      alert('Please select a subject and category.');
       return;
     }
-
-    // Trigger the onSave function with the selected subject, day, and time
-    onSave(selectedSubject, day, time);
+    onSave(selectedSubject, day, time, selectedCategory); // Pass selected category to onSave
   };
 
   return (
-    <div className="modal fade show">
-      <div className="modal-dialog">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h5 className="modal-title">Edit Class</h5>
-            <button type="button" className="close" onClick={onCancel}>
-              <span>&times;</span>
-            </button>
-          </div>
-          <div className="modal-body">
-            <div className="form-group">
-              <label htmlFor="subject">Select Subject</label>
-              <select
-                id="subject"
-                className="form-control"
-                value={selectedSubject}
-                onChange={(e) => setSelectedSubject(e.target.value)}
-              >
-                <option value="">Select a Subject</option>
-                {subjects.map((subject, index) => (
-                  <option key={index} value={subject.name}>
-                    {subject.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="form-group">
-              <label htmlFor="day">Day</label>
-              <input
-                id="day"
-                className="form-control"
-                type="text"
-                value={day}
-                disabled
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="time">Time Slot</label>
-              <input
-                id="time"
-                className="form-control"
-                type="text"
-                value={time}
-                disabled
-              />
-            </div>
-          </div>
-          <div className="modal-footer">
-            <button type="button" className="btn btn-secondary" onClick={onCancel}>
-              Cancel
-            </button>
-            <button type="button" className="btn btn-primary" onClick={handleSave}>
-              Save
-            </button>
-          </div>
-        </div>
+    <Modal
+      title="Edit Class"
+      visible={isModalOpen}
+      onOk={handleSave}
+      onCancel={onCancel}
+    >
+      <div className="form-group">
+        <label htmlFor="subject">Select Subject</label>
+        <Select
+          id="subject"
+          style={{ width: '100%' }}
+          value={selectedSubject}
+          onChange={setSelectedSubject}
+        >
+          <Option value="">Select a Subject</Option>
+          {subjects.map((subject, index) => (
+            <Option key={index} value={subject.name}>
+              {subject.name}
+            </Option>
+          ))}
+        </Select>
       </div>
-    </div>
+      <div className="form-group">
+        <label htmlFor="category">Select Category</label>
+        <Select
+          id="category"
+          style={{ width: '100%' }}
+          value={selectedCategory}
+          onChange={setSelectedCategory}
+        >
+          <Option value="">Select a Category</Option>
+          <Option value="Lecture">Lecture</Option>
+          <Option value="Tutorial">Tutorial</Option>
+          <Option value="Practical">Practical</Option>
+        </Select>
+      </div>
+      <div className="form-group">
+        <label htmlFor="day">Day</label>
+        <input id="day" className="form-control" type="text" value={day} disabled />
+      </div>
+      <div className="form-group">
+        <label htmlFor="time">Time Slot</label>
+        <input id="time" className="form-control" type="text" value={time} disabled />
+      </div>
+    </Modal>
   );
 };
 
